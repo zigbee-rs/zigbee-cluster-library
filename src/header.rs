@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn unpack_header_without_manufacturer_code() {
         // given
-        let input = [0x18, 0x01, 0x0a, 0x00, 0x00, 0x29, 0x8a, 0x0b];
+        let input = [0x18, 0x01, 0x0a];
 
         // when
         let header = ZclHeader::unpack_from_slice(&input).unwrap();
