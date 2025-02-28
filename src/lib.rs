@@ -30,5 +30,3 @@
 
 pub(crate) mod common;
 pub(crate) mod header;
-/// Generic measurement and sensing interfaces
-pub mod measurement;
