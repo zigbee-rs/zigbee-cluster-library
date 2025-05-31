@@ -28,5 +28,11 @@
     clippy::ignored_unit_patterns
 )]
 
-pub(crate) mod common;
-pub(crate) mod header;
+mod common;
+/// General ZCL Frame
+pub mod frame;
+
+pub mod header;
+
+/// Measurement
+pub mod measurement;
