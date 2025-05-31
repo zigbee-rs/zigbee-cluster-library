@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/github/license/thebino/zigbee-cluster-library?style=for-the-badge)](./LICENSE.md)
 ![ZigBee](https://img.shields.io/badge/zigbee-22.1.0-blue?color=4285F4&logo=zigbee&style=for-the-badge)
 ![Rust](https://img.shields.io/badge/rust-2018-orange?color=E45928&logo=rust&style=for-the-badge)
+[![Matrix](https://img.shields.io/matrix/zigbee:matrix.org?style=for-the-badge)](https://matrix.to/#/#zigbee:matrix.org)
 
 The **ZigBee cluster library** in `no_std` defines a set of standard commands and behaviors used for communication between
 devices within a Zigbee network.
