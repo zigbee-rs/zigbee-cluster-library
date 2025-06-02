@@ -23,6 +23,54 @@ macro_rules! impl_byte {
     };
     (
         $(#[$m:meta])*
+        $v:vis enum $name:ident {
+            $(
+                $(#[doc = $doc:literal])*
+                $(#[fallback = $fallback:literal])?
+                $variant:ident $(= $value:expr)?
+            ),+
+            $(,)?
+         }
+    ) => {
+        $(#[$m])*
+        $v enum $name {
+            $(
+                $(#[doc = $doc])*
+                $variant $(= $value)?
+            ),+
+        }
+
+        impl<C: ::core::default::Default> ::byte::TryRead<'_, C> for $name {
+            fn try_read(bytes: &'_ [u8], _: C) -> ::byte::Result<(Self, usize)> {
+                use ::byte::BytesExt;
+                let offset = &mut 0;
+                let id: u8 = bytes.read(offset)?;
+                let variant = match id {
+                    $(
+                        $($value => Self::$variant)?
+                        $(
+                            _ => {
+                                let _ = $fallback;
+                                Self::$variant
+                            },
+                        )?
+                    ),+
+                };
+                Ok((variant, *offset))
+            }
+        }
+
+        impl<C: ::core::default::Default> ::byte::TryWrite<C> for $name {
+            fn try_write(self, bytes: &mut [u8], _: C) -> ::byte::Result<usize> {
+                use ::byte::BytesExt;
+                let offset = &mut 0;
+                bytes.write_with(offset, self as u8, ::byte::LE)?;
+                Ok(*offset)
+            }
+        }
+    };
+    (
+        $(#[$m:meta])*
         $v:vis struct $name:ident $(<$lifetime:lifetime>)? {
             $(
                 $(#[doc = $doc:literal])*
@@ -118,9 +166,12 @@ mod tests {
     use byte::TryRead;
     use byte::TryWrite;
 
+    use crate::common::types::ShortAddress;
+
     impl_byte! {
         struct DataFrame<'a> {
             flag: u8,
+            address: ShortAddress,
             #[parse_if = flag > 0]
             opt: Option<u16>,
             length: u8,
@@ -131,21 +182,38 @@ mod tests {
 
     #[test]
     fn parse() {
-        let bytes = &[0x01, 0x11, 0x22, 0x4, 0xaa, 0xaa, 0xaa, 0xaa];
+        let bytes = &[0x01, 0x12, 0xff, 0x11, 0x22, 0x4, 0xaa, 0xaa, 0xaa, 0xaa];
 
-        let (frame, len) =
-            DataFrame::try_read(bytes, ()).expect("Could not read DataFrame in test");
+        let (frame, len) = DataFrame::try_read(bytes, ()).unwrap();
 
-        assert_eq!(len, 8);
+        assert_eq!(len, 10);
         assert_eq!(frame.flag, 0x01);
+        assert_eq!(frame.address, ShortAddress(0xff12));
         assert_eq!(frame.opt, Some(0x2211));
         assert_eq!(frame.length, 0x04);
         assert_eq!(frame.data, &[0xaa, 0xaa, 0xaa, 0xaa]);
 
-        let mut buf = [0u8; 8];
-        frame
-            .try_write(&mut buf, ())
-            .expect("Could not write DataFrame in test");
+        let mut buf = [0u8; 10];
+        frame.try_write(&mut buf, ()).unwrap();
         assert_eq!(&buf, bytes);
+    }
+
+    impl_byte! {
+        #[derive(Debug,PartialEq, Eq)]
+        #[repr(u8)]
+        enum Command {
+            Data = 0x01,
+            Payload = 0x02,
+            #[fallback = true]
+            Reserved,
+        }
+    }
+
+    #[test]
+    fn parse_enum() {
+        let bytes = &[0x02];
+        let (command, len) = Command::try_read(bytes, ()).unwrap();
+        assert_eq!(len, 1);
+        assert_eq!(command, Command::Payload);
     }
 }
