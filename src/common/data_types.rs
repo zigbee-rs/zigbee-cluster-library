@@ -1,3 +1,10 @@
+//! Data types
+//!
+//! See section 2.6.2
+use byte::{TryRead, TryWrite};
+
+use crate::header::ZclHeader;
+
 #[derive(Debug, PartialEq)]
 pub enum ZclDataType<'a> {
     NoData,
@@ -18,6 +25,20 @@ pub enum ZclDataType<'a> {
     Misc(MiscType<'a>),
     Unknown,
 }
+impl TryWrite<&ZclHeader> for ZclDataType<'_> {
+    fn try_write(self, bytes: &mut [u8], header: &ZclHeader) -> Result<usize, ::byte::Error> {
+        // header.command_identifier
+        unimplemented!()
+    }
+}
+
+impl<'a> TryRead<'a, &ZclHeader> for ZclDataType<'a> {
+    fn try_read(bytes: &'a [u8], header: &ZclHeader) -> Result<(Self, usize), ::byte::Error> {
+        unimplemented!()
+    }
+}
+
+
 
 impl ZclDataType<'_> {
     pub fn length(&self) -> usize {
@@ -43,6 +64,7 @@ impl ZclDataType<'_> {
     }
 }
 
+/// 2.6.2.2 General Data
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataN {
     Data8(u8),
@@ -70,6 +92,7 @@ impl DataN {
     }
 }
 
+/// 2.6.2.4 Bitmap
 #[derive(Debug, PartialEq, Eq)]
 pub enum BitmapN {
     Bitmap8(u8),
@@ -97,6 +120,7 @@ impl BitmapN {
     }
 }
 
+/// 2.6.2.5 Unsigned Integer
 #[derive(Debug, PartialEq, Eq)]
 pub enum UnsignedN {
     Uint8(u8),
@@ -124,6 +148,7 @@ impl UnsignedN {
     }
 }
 
+/// 2.6.2.6 Signed Integer
 #[derive(Debug, PartialEq, Eq)]
 pub enum SignedN {
     Int8(i8),
@@ -151,6 +176,7 @@ impl SignedN {
     }
 }
 
+//// 2.6.2.7 Enumeration
 #[derive(Debug, PartialEq, Eq)]
 pub enum EnumN {
     Enum8(u8),
@@ -168,8 +194,11 @@ impl EnumN {
 
 #[derive(Debug, PartialEq)]
 pub enum FloatN {
-    Semi(u16), // Could represent custom 16-bit float as needed
+    /// 2.6.2.8 Semi-precision based on IEEE-754
+    Semi(u16),
+    /// 2.6.2.9 Single precision
     Single(f32),
+    /// 2.6.2.10 Double precision
     Double(f64),
 }
 
@@ -185,9 +214,13 @@ impl FloatN {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ZclString<'a> {
+    /// 2.6.2.12 Octet String
     OctetString(&'a [u8]),
+    /// 2.6.2.13 Character String
     CharString(&'a str),
+    /// 2.6.2.14 Long Octet String
     LongOctetString(&'a [u8]),
+    /// 2.6.2.15 Long Character String
     LongCharString(&'a str),
 }
 
@@ -204,8 +237,11 @@ impl ZclString<'_> {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TimeType {
+    /// 2.6.2.19 Time of day
     TimeOfDay(u32),
+    /// 2.6.2.20 Date
     Date(u32),
+    /// 2.6.2.21 UTC Time
     UTCTime(u32),
 }
 
@@ -217,8 +253,11 @@ impl TimeType {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum IdentifierType {
+    /// 2.6.2.22 Cluster ID
     ClusterId(u16),
+    /// 2.6.2.23 Attribute ID
     AttributeId(u16),
+    /// 2.6.2.24 BACnet OID (Object Identifier)
     BACnetOid(u32),
 }
 
@@ -234,7 +273,9 @@ impl IdentifierType {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum MiscType<'a> {
+    /// 2.6.2.25 IEEE Address
     IeeeAddress(u64),
+    /// 128-bit Security Key
     SecurityKey(&'a [u8; 16]),
 }
 

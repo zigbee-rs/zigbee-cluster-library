@@ -31,6 +31,7 @@
 mod common;
 /// General ZCL Frame
 pub mod frame;
+pub mod payload;
 
 pub mod header;
 
