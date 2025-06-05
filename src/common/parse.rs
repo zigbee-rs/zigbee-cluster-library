@@ -140,8 +140,7 @@ macro_rules! impl_byte {
                 $(
                     let ctx = ::byte::LE;
                     $(
-                        let _ = $ctx_hdr;
-                        let ctx = ();
+                        let ctx = $ctx_hdr;
                     )?
 
                     let should_write = true;

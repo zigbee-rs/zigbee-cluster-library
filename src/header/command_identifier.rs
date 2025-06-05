@@ -1,4 +1,5 @@
 //! Command Identifier.
+use crate::impl_byte;
 use byte::{TryRead, TryWrite};
 
 /// Command Identifier.
@@ -7,6 +8,7 @@ use byte::{TryRead, TryWrite};
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum CommandIdentifier {
     ReadAttributes = 0x00,
     ReadAttributesResponse = 0x01,

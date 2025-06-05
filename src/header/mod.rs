@@ -15,7 +15,7 @@ use core::fmt::Debug;
 
 impl_byte! {
     /// 2.4.1 ZCL Header
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
     pub struct ZclHeader {
         /// See Section 2.4.1.1.
         pub frame_control: FrameControl,
