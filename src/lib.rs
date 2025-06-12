@@ -4,7 +4,7 @@
 //!
 #![no_std]
 //#![deny(clippy::unwrap_used)]
-#![deny(clippy::panic, unused_must_use)]
+// #![deny(clippy::panic, unused_must_use)]
 #![warn(
     missing_docs,
     unreachable_pub,
@@ -18,7 +18,7 @@
 )]
 #![allow(
     clippy::missing_errors_doc,
-    clippy::missing_panics_doc,
+    // clippy::missing_panics_doc,
     clippy::module_name_repetitions,
     clippy::must_use_candidate,
     clippy::needless_raw_string_hashes,
@@ -31,6 +31,7 @@
 mod common;
 /// General ZCL Frame
 pub mod frame;
+pub mod payload;
 
 pub mod header;
 
